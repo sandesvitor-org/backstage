@@ -35,13 +35,8 @@ backend:
 integrations:
   github:
     - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
-      token: ${GITHUB_TOKEN}
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
+      apps:
+        - $include: github-app-backstage-sandesvitor-credentials.yaml
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -61,35 +56,68 @@ techdocs:
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
-auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers: {}
+# auth:
+#   environment: development
+#   providers:
+#     github:
+#       development:
+#         clientId:
+#           $env: AUTH_GITHUB_CLIENT_ID
+#         clientSecret:
+#           $env: AUTH_GITHUB_CLIENT_SECRET
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
+  providers:
+    github:
+      sandesvitor-org:
+        organization: 'sandesvitor-org' # string
+        catalogPath: '/catalog-info.yaml' # string
+        validateLocationsExist: true
+        filters:
+          branch: 'main' # string
+          repository: '.*' # Regex
+        schedule:
+          frequency: { minutes: 35 }
+          timeout: { minutes: 30 }
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [Component, System, Domain, API, Resource, Location]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
-    - type: file
-      target: ../../examples/entities.yaml
-
-    # Local example template
-    - type: file
-      target: ../../examples/template/template.yaml
+    - type: url
+      target: https://github.com/sandesvitor-org/backstage-templates/blob/main/all.yaml
       rules:
-        - allow: [Template]
-
-    # Local example organizational data
-    - type: file
-      target: ../../examples/org.yaml
+        - allow: [ Template ]
+    - type: github-org
+      target: https://github.com/sandesvitor-org
       rules:
-        - allow: [User, Group]
+        - allow: [Group, User]
+# catalog:
+#   import:
+#     entityFilename: catalog-info.yaml
+#     pullRequestBranchName: backstage-integration
+#   rules:
+#     - allow: [Component, System, API, Resource, Location]
+#   locations:
+#     # Local example data, file locations are relative to the backend process, typically `packages/backend`
+#     - type: file
+#       target: ../../examples/entities.yaml
+
+#     # Local example template
+#     - type: file
+#       target: ../../examples/template/template.yaml
+#       rules:
+#         - allow: [Template]
+
+#     # Local example organizational data
+#     - type: file
+#       target: ../../examples/org.yaml
+#       rules:
+#         - allow: [User, Group]
 
     ## Uncomment these lines to add more example data
     # - type: url
