@@ -1,9 +1,9 @@
 import { CatalogClient } from '@backstage/catalog-client';
 import { createBuiltinActions, createRouter } from '@backstage/plugin-scaffolder-backend';
 import { ScmIntegrations } from '@backstage/integration';
-import { createNewResourceAction } from './scaffolder/actions/create-resource';
 import { Router } from 'express';
 import type { PluginEnvironment } from '../types';
+import { pokemonAction } from './scaffolder/actions/pokemon';
 
 export default async function createPlugin(
   env: PluginEnvironment,
@@ -22,7 +22,7 @@ export default async function createPlugin(
     reader: env.reader,
   });
 
-  const actions = [...builtInActions, createNewResourceAction()];
+  const actions = [...builtInActions, pokemonAction()];
 
   return await createRouter({
     actions,
