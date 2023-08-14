@@ -18,9 +18,11 @@ export const pokemonAction = () => {
         },
       },
       async handler(ctx) {
-        ctx.logger.info(`Buscando o pokemon [${ctx.input.pokemon}] no PokeAPI...`);
+        const pokemon = ctx.input.pokemon.toLowerCase().trim()
 
-        const pokemonOfficialArtworkURL = await axios.get(`https://pokeapi.co/api/v2/pokemon/${ctx.input.pokemon}`)
+        ctx.logger.info(`Buscando o pokemon [${pokemon}] no PokeAPI...`);
+
+        const pokemonOfficialArtworkURL = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
           .then(response => response["data"]["sprites"]["other"]["official-artwork"]["front_default"])
 
         ctx.logger.info(`URL: ${pokemonOfficialArtworkURL}`)
